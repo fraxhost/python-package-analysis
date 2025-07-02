@@ -3,18 +3,14 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 
 def count_directories(path):
-    """
-    Count all directories recursively starting from path.
-    """
+    """ Count all directories recursively starting from path. """
     count = 0
     for dirpath, dirnames, filenames in os.walk(path):
         count += len(dirnames)
     return count
 
 def select_directory_and_count():
-    """
-    Open dialog to select a directory, count its subdirectories, and display result.
-    """
+    """ Open dialog to select a directory, count its subdirectories, and display result. """
     directory = filedialog.askdirectory(title="Select a directory to count subdirectories")
     if directory:
         dir_count = count_directories(directory)
