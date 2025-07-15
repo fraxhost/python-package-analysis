@@ -3,7 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # 1. Load and clean data
-df = pd.read_csv('../csv/package_loc.csv')
+df = pd.read_csv('../csv/package_loc_annotated.csv')
 df['Total Lines of Code'] = pd.to_numeric(df['Total Lines of Code'], errors='coerce')
 df = df.dropna(subset=['Total Lines of Code'])
 
@@ -36,5 +36,5 @@ hist_df = pd.DataFrame({
     'bin_value': range(min_loc, max_loc + 1),
     'count': counts.astype(int)
 })
-hist_df.to_csv('../csv/package_loc_bins_counts.csv', index=False)
+hist_df.to_csv('../csv/package_loc_annotated_bins_counts.csv', index=False)
 print("Saved integer bin counts to loc_integer_bins_counts.csv")
