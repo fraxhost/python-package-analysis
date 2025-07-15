@@ -1,30 +1,40 @@
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-df = pd.read_csv('package_line_totals.csv')
-
-# Convert LOC to numeric
+# 1. Load and clean data
+df = pd.read_csv('../csv/package_loc.csv')
 df['Total Lines of Code'] = pd.to_numeric(df['Total Lines of Code'], errors='coerce')
 df = df.dropna(subset=['Total Lines of Code'])
 
-# Create bins: 0-1000, 1001-2000, 2001-3000, ..., up to the max value
-max_loc = df['Total Lines of Code'].max()
-bin_width = 1000
-bins = list(range(0, int(max_loc) + bin_width, bin_width))
-labels = [f"{b+1}-{b+bin_width}" if b > 0 else f"{b}-{b+bin_width}" for b in bins[:-1]]
+# (Optional) Filter the desired range
+df = df[df['Total Lines of Code'].between(5, 75)]
 
-# Categorize each package into a bin
-df['LOC Range'] = pd.cut(df['Total Lines of Code'], bins=bins, labels=labels, right=True, include_lowest=True)
+# 2. Define bin edges so that each integer has its own bin
+min_loc = int(df['Total Lines of Code'].min())
+max_loc = int(df['Total Lines of Code'].max())
+bin_edges = np.arange(min_loc - 0.5, max_loc + 1.5, 1)
+# This sets up bins: [4.5–5.5), [5.5–6.5), …, capturing exact integer values centrally :contentReference[oaicite:0]{index=0}
 
-# Count packages per bin
-range_counts = df['LOC Range'].value_counts().sort_index()
+# 3. Plot histogram
+counts, edges, patches = plt.hist(
+    df['Total Lines of Code'],
+    bins=bin_edges,
+    edgecolor='black',
+    align='mid'
+)
 
-# Plot histogram of package counts per LOC range
-plt.figure(figsize=(14, 6))
-plt.bar(range_counts.index.astype(str), range_counts.values, color='skyblue', edgecolor='black')
-plt.xticks(rotation=45, ha='right')
-plt.xlabel('Lines of Code Range')
-plt.ylabel('Number of Packages')
-plt.title('Packages per Lines of Code Range')
+plt.xlabel('Lines of Code')
+plt.ylabel('Package Count')
+plt.title('Histogram with Exact Integer Bins')
+plt.xticks(range(min_loc, max_loc + 1))
 plt.tight_layout()
 plt.show()
+
+# 4. Export bin counts to CSV
+hist_df = pd.DataFrame({
+    'bin_value': range(min_loc, max_loc + 1),
+    'count': counts.astype(int)
+})
+hist_df.to_csv('../csv/package_loc_bins_counts.csv', index=False)
+print("Saved integer bin counts to loc_integer_bins_counts.csv")
